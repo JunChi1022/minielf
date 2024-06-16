@@ -7,7 +7,8 @@
 
 int main(int argc, char *argv[]) {
     cmdline::parser cmdParser;
-    cmdParser.add("info", 'i', "print header info for input elf");
+    cmdParser.add("info", 'i', "print infomation for input elf");
+    cmdParser.add("exec", 'e', "execuate this elf");
 
     cmdParser.parse_check(argc, argv);
 
@@ -24,7 +25,11 @@ int main(int argc, char *argv[]) {
     }
 
     if (cmdParser.exist("info")) {
-        reader.PrintHeaderInfo();
+        reader.PrintElfInfo();
+    }
+
+    if (cmdParser.exist("exec")) {
+      //TODO: support execuate the input elf, if it is execuatable
     }
 
     return 0;
