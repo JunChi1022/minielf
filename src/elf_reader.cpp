@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <map>
+#include <iomanip>
 #include "elf_reader.h"
 
 const std::map<uint8_t, const char *> bwMap = {
@@ -23,17 +24,17 @@ const std::map<uint16_t, const char *> typeMap = {
 };
 
 const std::map<uint32_t, const char *> phTypeMap = {
-    {0x0, "NULL"},
-    {0x1, "LOAD"},
-    {0x2, "DYNAMIC"},
-    {0x3, "INTERP"},
-    {0x4, "NOTE"},
-    {0x6, "PHDR"},
-    {0x7, "TLS"},
-    {0x6474e550, "GNU_EH_FRAME"},
-    {0x6474e551, "GNU_STACK"},
-    {0x6474e552, "GNU_RELRO"},
-    {0x6474e553, "GNU_PROPERTY"},
+    {0x0,        "            NULL"},
+    {0x1,        "            LOAD"},
+    {0x2,        "         DYNAMIC"},
+    {0x3,        "          INTERP"},
+    {0x4,        "            NOTE"},
+    {0x6,        "            PHDR"},
+    {0x7,        "             TLS"},
+    {0x6474e550, "    GNU_EH_FRAME"},
+    {0x6474e551, "       GNU_STACK"},
+    {0x6474e552, "       GNU_RELRO"},
+    {0x6474e553, "    GNU_PROPERTY"},
 };
 
 ElfReader::ElfReader(const char *file_name) {
@@ -92,6 +93,13 @@ static std::string PrintElfFlags(uint32_t flags) {
     if (flags & 0x1) {
         res += "X";
     }
+    if (res.size() == 1) {
+        res = "               " + res;
+    } else if (res.size() == 2) {
+        res = "              " + res;
+    } else {
+        res = "             " + res;
+    }
     return res;
 }
 
@@ -106,18 +114,20 @@ void ElfReader::PrintElfInfo() {
 
   // program header
   std::cout << std::endl << "Program headers:" << std::endl;
+  std::cout << std::hex;
   for (size_t i = 0; i < phHeaders.size(); i++) {
     std::cout << "[" << i << "]:" << std::endl;
     std::cout << "Type:   " << phTypeMap.at(phHeaders[i]->type) << "\t"
-              << "Offset: " << std::hex << phHeaders[i]->offset << std::dec
-              << "\t" << "VAddr:  " << std::hex << phHeaders[i]->vaddr
-              << std::dec << "\t" << "PAddr:  " << std::hex
-              << phHeaders[i]->paddr << std::dec << std::endl;
-    std::cout << "FileSz: " << std::hex << phHeaders[i]->filesz << std::dec
-              << "\t" << "MemSz:  " << std::hex << phHeaders[i]->memsz
-              << std::dec << "\t"
+              << "Offset: " << std::setw(16) << std::setfill('0')
+              << phHeaders[i]->offset << "\t" << "VAddr:  " << std::setw(16)
+              << std::setfill('0') << phHeaders[i]->vaddr << "\t"
+              << "PAddr:  " << std::setw(16) << std::setfill('0')
+              << phHeaders[i]->paddr << std::endl;
+    std::cout << "FileSz: " << std::setw(16) << std::setfill('0')
+              << phHeaders[i]->filesz << "\t" << "MemSz:  " << std::setw(16)
+              << std::setfill('0') << phHeaders[i]->memsz << "\t"
               << "Flags:  " << PrintElfFlags(phHeaders[i]->flags) << "\t"
-              << "Align:  " << std::hex << phHeaders[i]->align << std::dec
-              << std::endl;
+              << "Align:  " << phHeaders[i]->align << std::endl;
   }
+  std::cout << std::dec;
 }
