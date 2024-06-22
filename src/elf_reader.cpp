@@ -6,13 +6,13 @@
 #include "elf_reader.h"
 
 const std::map<uint8_t, const char *> bwMap = {
-    // {1, "32 bits"},
+    {1, "32 bits"},
     {2, "64 bits"},
 };
 
 const std::map<uint8_t, const char *> endianMap = {
     {0x1, "little endian"},
-    // {0x2, "big endian"},
+    {0x2, "big endian"},
 };
 
 const std::map<uint16_t, const char *> typeMap = {
@@ -107,10 +107,14 @@ void ElfReader::PrintElfInfo() {
   // elf header
   std::cout << "ELF Header:" << std::endl;
   ElfHeader_t *elf_header = (ElfHeader_t *)buffer;
-  std::cout << "Class:          " << bwMap.at(elf_header->bitWidth) << std::endl;
-  std::cout << "Data:           " << endianMap.at(elf_header->endian) << std::endl;
-  std::cout << "Type:           " << typeMap.at(elf_header->type) << std::endl;
-  std::cout << "Entry Address:  0x" << std::hex << elf_header->entry << std::dec << std::endl;
+  std::cout << "Class:                     " << bwMap.at(elf_header->bitWidth) << std::endl;
+  std::cout << "Data:                      " << endianMap.at(elf_header->endian) << std::endl;
+  std::cout << "Type:                      " << typeMap.at(elf_header->type) << std::endl;
+  std::cout << "Entry Address:             0x" << std::hex << elf_header->entry << std::dec << std::endl;
+  std::cout << "Start of program headers:  " << elf_header->phoff << std::endl;
+  std::cout << "Start of section headers:  " << elf_header->shoff << std::endl;
+  std::cout << "Number of program headers: " << elf_header->phnum << std::endl;
+  std::cout << "Number of section headers: " << elf_header->shnum << std::endl;
 
   // program header
   std::cout << std::endl << "Program headers:" << std::endl;
@@ -130,4 +134,9 @@ void ElfReader::PrintElfInfo() {
               << "Align:  " << phHeaders[i]->align << std::endl;
   }
   std::cout << std::dec;
+}
+
+bool ElfReader::IsStaticExe() {
+    ElfHeader_t *elfHeader = (ElfHeader_t *)buffer;
+    return ((ElfHeader_t *)buffer)->type == 0x2;
 }

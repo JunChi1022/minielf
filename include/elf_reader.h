@@ -36,6 +36,11 @@ typedef struct ElfProgramHeader_s {
     uint64_t align;
 } ElfProgramHeader_t;
 
+typedef struct ElfSectionHeader_s {
+    uint32_t name;
+    
+} ElfSectionHeader_t;
+
 class ElfReader {
     uint64_t fileSize = 0;
     uint8_t *buffer = nullptr;
@@ -46,5 +51,21 @@ public:
     ~ElfReader();
 
     bool CheckElf();
+    bool IsStaticExe();
     void PrintElfInfo();
+    std::vector<ElfProgramHeader_t *>::const_iterator phbegin() const {
+      return phHeaders.cbegin();
+    }
+    std::vector<ElfProgramHeader_t *>::const_iterator phend() const {
+      return phHeaders.cend();
+    }
+
+    void *GetEntryPoint() {
+        ElfHeader_t *elf_header = (ElfHeader_t *)buffer;
+      return (void *)elf_header->entry;
+    }
+
+    uint8_t *GetBuffer() {
+        return buffer;
+    }
 };
