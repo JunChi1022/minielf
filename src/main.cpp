@@ -5,7 +5,7 @@
 #include "elf_loader.h"
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char *envv[]) {
     cmdline::parser cmdParser;
     cmdParser.add("info", 'i', "print infomation for input elf");
     cmdParser.add("exec", 'e', "execuate this elf");
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
       for (int i = cmdParser.rest().size() - 1; i < argc; ++i) {
         exec[i] = argv[i];
       }
-      loader.Exec(cmdParser.rest().size(), exec, nullptr);
+      loader.Exec(cmdParser.rest().size(), exec, envv);
     }
 
     return 0;
