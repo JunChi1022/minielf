@@ -37,6 +37,13 @@ const std::map<uint32_t, const char *> phTypeMap = {
     {0x6474e553, "    GNU_PROPERTY"},
 };
 
+enum : unsigned {
+  SHT_NULL = 0,
+  SHT_PROGBITS = 1,       // Program-defined contents.
+  SHT_SYMTAB = 2,         // Symbol table.
+  SHT_STRTAB = 3,         // String table
+};
+
 ElfReader::ElfReader(const char *file_name) {
     FILE *fp = fopen(file_name, "r");
     if (fp == NULL) {
@@ -61,6 +68,23 @@ ElfReader::ElfReader(const char *file_name) {
     for (int i = 0; i < elfHeader->phnum; ++i) {
       phHeaders.push_back((ElfProgramHeader_t *)(buffer + elfHeader->phoff +
                                                  i * elfHeader->phentsize));
+    }
+
+    // get symbol table ans string table
+    for (int i = 0; i < elfHeader->shnum; ++i) {
+      ElfSectionHeader_t *sectionHeader = (ElfSectionHeader_t *)(buffer + elfHeader->shoff +
+                                                                 i * elfHeader->shentsize);
+      if (sectionHeader->type == SHT_STRTAB) {
+        strTab = sectionHeader;
+      } else if (sectionHeader->type == SHT_SYMTAB) {
+        sybTab = sectionHeader;
+      }
+    }
+
+    // get all symbols
+    for (int i = 0; i < sybTab->size / sybTab->entSize; ++i) {
+      ElfSymbol_t *symbol = (ElfSymbol_t *)(buffer + sybTab->offset + i * sybTab->entSize);
+      syms.push_back(symbol);
     }
 }
 

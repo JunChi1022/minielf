@@ -38,14 +38,36 @@ typedef struct ElfProgramHeader_s {
 
 typedef struct ElfSectionHeader_s {
     uint32_t name;
-    
+    uint32_t type;
+    uint64_t flags;
+    uint64_t addr;
+    uint64_t offset;
+    uint64_t size;
+    uint32_t link;
+    uint32_t info;
+    uint64_t addrAlign;
+    uint64_t entSize;
 } ElfSectionHeader_t;
+
+typedef struct ElfSymbol_s {
+    uint32_t name;
+    uint8_t info;
+    uint8_t other;
+    uint16_t shndx; // in which section
+    uint64_t value; // value or address associated with the symbol
+    uint64_t size;
+} ElfSymbol_t;
 
 class ElfReader {
     uint64_t fileSize = 0;
     uint8_t *buffer = nullptr;
 
+    ElfSectionHeader_t *strTab = nullptr;
+    ElfSectionHeader_t *sybTab = nullptr;
+
     std::vector<ElfProgramHeader_t *> phHeaders;
+
+    std::vector<ElfSymbol_t *> syms;
 public:
     ElfReader(const char *file_name);
     ~ElfReader();
